@@ -4,6 +4,35 @@ import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 
+const modStrings = {'r': 0, 'w': 1, 'x': 2};
+
+function convertToShortString(permission_number) {
+  if(permission_number >= 4) {
+    return 'r' + convertToShortString(permission_number - 4);
+  } else if (permission_number >= 2) {
+    return 'w' + convertToShortString(permission_number - 2);
+  } else if (permission_number >= 1) {
+    return 'x' + convertToShortString(permission_number - 1);
+  }
+
+  return '';
+}
+
+function convertToString(permission_number) {
+  let short_string = convertToShortString(permission_number)
+  let sample_string = '';
+
+  Object.keys(modStrings).forEach((key) => {
+    if(short_string.includes(key)) {
+      sample_string += key;
+    } else {
+      sample_string += '-';
+    }
+  });
+
+  return sample_string;
+}
+
 class CheckBox extends React.Component {
   constructor(props) {
     super(props);
@@ -15,8 +44,8 @@ class CheckBox extends React.Component {
     let permission_value = e.target.value;
 
     this.setState({ checked: !this.state.checked },
-                  () => { this.props.onCheckboxChange(permission_value, this.state.checked)
-                });
+      () => { this.props.onCheckboxChange(permission_value, this.state.checked)
+    });
   }
 
   render() {
@@ -32,11 +61,10 @@ class CheckBox extends React.Component {
 class Permission extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { permission_number: 0,
-                   read_permission: '-',
-                   write_permission: '-',
-                   execute_permission: '-',
-                   permission_group_name: props.permission_group_name };
+    this.state = {
+      permission_number: 0,
+      permission_group_name: props.permission_group_name
+    };
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
   }
 
@@ -51,21 +79,6 @@ class Permission extends React.Component {
     }
 
     await this.setState({ permission_number: permission_number });
-
-    // switch(permission_val) {
-    //   case 4:
-    //     await this.setState({ read_permission: 'r' });
-    //     break;
-    //   case 2:
-    //     await this.setState({ write_permission: 'w' });
-    //     break;
-    //   case 1:
-    //     await this.setState({ write_permission: 'x' });
-    //     break;
-    //   default:
-    //     break;
-    // }
-
     await this.props.onModChange(this.state.permission_number, this.state.permission_group_name);
   }
 
@@ -124,52 +137,34 @@ class LinuxPermission extends React.Component {
   }
 }
 
-class PermissionNumber extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { permission_number: ''};
-  }
-
-  render() {
-    return(
-      <div className="col-md-4">
-        <input type="text" name="permissions_number" placeholder="000"/>
-      </div>
-    )
-  }
-}
-
-class PermissionString extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { permission_string: ''};
-  }
-
-  render() {
-    return(
-      <div className="col-md-4">
-        <input type="text" name="permissions_string" placeholder="rwxrwxrwx"/>
-      </div>
-    )
-  }
-}
-
 class ChmodCaculator extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      permission_number: '000'
+      permission_number: '',
+      permission_string: ''
     };
     this.handleUpdatePermissionNumber = this.handleUpdatePermissionNumber.bind(this);
   }
 
   handleUpdatePermissionNumber(mods) {
-    let permission_number = ''
+    let permission_number = '';
+    let permission_string = '';
+
     Object.keys(mods).forEach((key) => {
       permission_number += mods[key];
+      permission_string += convertToString(parseInt(mods[key]));
     })
 
-    this.setState({ permission_number: permission_number });
+    this.setState({ permission_number: permission_number, permission_string: permission_string });
+  }
+
+  handlePermissionNumberChange() {
+
+  }
+
+  handlePermissionStringChange() {
+
   }
 
   render() {
@@ -179,8 +174,12 @@ class ChmodCaculator extends React.Component {
         <br/>
         <div className="row">
           <h1 className="col-md-4">Linux Permissions</h1>
-          <PermissionNumber></PermissionNumber>
-          <PermissionString></PermissionString>
+          <div className="col-md-4">
+            <input type="text" name="permissions_number" placeholder="000" value={ this.state.permission_number } onChange={ this.handlePermissionNumberChange }/>
+          </div>
+          <div className="col-md-4">
+            <input type="text" name="permissions_string" placeholder="rwxrwxrwx" value={ this.state.permission_string } onChange={ this.handlePermissionStringChange }/>
+          </div>
         </div>
       </div>
     )
