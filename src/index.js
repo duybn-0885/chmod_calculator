@@ -39,7 +39,7 @@ class CheckBox extends React.Component {
     return (
       <div>
         <label><strong>{ this.props.permissionName }</strong></label>
-        <input type="checkbox" name="permission" value={ this.props.permissionValue } onChange={ this.handleChange } checked={this.props.permission}/>
+        <input type="checkbox" name="permission" value={ this.props.permissionValue } onChange={ this.handleChange } checked={ this.props.permission || this.state.checked }/>
       </div>
     )
   }
