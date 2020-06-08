@@ -4,35 +4,21 @@ import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 
-const modStrings = {'r': 0, 'w': 1, 'x': 2};
 const regexPermissionNumber = /^[0-7]{3}$/g;
 const regexPermissionString = /^([r-][w-][x-]){3}$g/;
-
-function convertToShortString(permissionNumber) {
-  if(permissionNumber >= 4) {
-    return 'r' + convertToShortString(permissionNumber - 4);
-  } else if (permissionNumber >= 2) {
-    return 'w' + convertToShortString(permissionNumber - 2);
-  } else if (permissionNumber >= 1) {
-    return 'x' + convertToShortString(permissionNumber - 1);
-  }
-
-  return '';
+const modStrings = {
+  '---': 0,
+  '--x': 1,
+  '-w-': 2,
+  '-wx': 3,
+  'r--': 4,
+  'r-x': 5,
+  'rw-': 6,
+  'rwx': 7
 }
 
-function convertToString(permissionNumber) {
-  let shortString = convertToShortString(permissionNumber)
-  let sampleString = '';
-
-  Object.keys(modStrings).forEach((key) => {
-    if(shortString.includes(key)) {
-      sampleString += key;
-    } else {
-      sampleString += '-';
-    }
-  });
-
-  return sampleString;
+function getKeyByValue(object, value) {
+  return Object.keys(object).find(key => object[key] === value);
 }
 
 class CheckBox extends React.Component {
@@ -161,7 +147,7 @@ class ChmodCaculator extends React.Component {
 
     Object.keys(mods).forEach((key) => {
       permissionNumber += mods[key];
-      permissionString += convertToString(parseInt(mods[key]));
+      permissionString += getKeyByValue(modStrings, parseInt(mods[key]));
     })
 
     this.setState({ permissionNumber: permissionNumber, permissionString: permissionString });
