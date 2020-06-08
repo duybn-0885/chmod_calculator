@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/chmod-caculator/static/css/main.5ecd60fb.chunk.css",
+    "main.js": "/chmod-caculator/static/js/main.57bafca6.chunk.js",
+    "main.js.map": "/chmod-caculator/static/js/main.57bafca6.chunk.js.map",
+    "runtime-main.js": "/chmod-caculator/static/js/runtime-main.f50dc27e.js",
+    "runtime-main.js.map": "/chmod-caculator/static/js/runtime-main.f50dc27e.js.map",
+    "static/js/2.057e378e.chunk.js": "/chmod-caculator/static/js/2.057e378e.chunk.js",
+    "static/js/2.057e378e.chunk.js.map": "/chmod-caculator/static/js/2.057e378e.chunk.js.map",
+    "index.html": "/chmod-caculator/index.html",
+    "precache-manifest.1b90b0a681d5d567f8113c8107d0faee.js": "/chmod-caculator/precache-manifest.1b90b0a681d5d567f8113c8107d0faee.js",
+    "service-worker.js": "/chmod-caculator/service-worker.js",
+    "static/css/main.5ecd60fb.chunk.css.map": "/chmod-caculator/static/css/main.5ecd60fb.chunk.css.map",
+    "static/js/2.057e378e.chunk.js.LICENSE.txt": "/chmod-caculator/static/js/2.057e378e.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.f50dc27e.js",
+    "static/js/2.057e378e.chunk.js",
+    "static/css/main.5ecd60fb.chunk.css",
+    "static/js/main.57bafca6.chunk.js"
+  ]
+}
