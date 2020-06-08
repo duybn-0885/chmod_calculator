@@ -179,10 +179,10 @@ class ChmodCaculator extends React.Component {
         this.setState({
           permissionNumber: permissionNumber,
           permissionString: permissionString,
-          permissionNumberClassInput: 'has-success'
+          permissionNumberClassInput: 'is-valid'
         });
       } else {
-        this.setState({ permissionNumberClassInput: 'has-error' });
+        this.setState({ permissionNumberClassInput: 'is-invalid' });
       }
     }
   }
@@ -192,10 +192,10 @@ class ChmodCaculator extends React.Component {
       if(e.target.value.match(regexPermissionString)) {
         this.setState({
           permissionString: e.target.value,
-          permissionStringClassInput: 'has-success'
+          permissionStringClassInput: 'is-valid'
         });
       } else {
-        this.setState({ permissionStringClassInput: 'has-error' });
+        this.setState({ permissionStringClassInput: 'is-invalid' });
       }
     }
   }
@@ -208,13 +208,13 @@ class ChmodCaculator extends React.Component {
         <div className="row">
           <h1 className="col-md-4">Linux Permissions</h1>
           <div className="col-md-4">
-            <div className={`form-group ${this.state.permissionNumberClassInput}`}>
-              <input type="text" name="permissions_number" placeholder="000" value={ this.state.permissionNumber } onChange={ this.handlePermissionNumberChange } onKeyPress= { this.handlePermissionNumberEntered }/>
+            <div>
+              <input className={`form-control ${this.state.permissionNumberClassInput}`} type="text" name="permissions_number" placeholder="000" value={ this.state.permissionNumber } onChange={ this.handlePermissionNumberChange } onKeyPress= { this.handlePermissionNumberEntered }/>
             </div>
           </div>
           <div className="col-md-4">
-            <div className={`form-group ${this.state.permissionStringClassInput}`}>
-              <input type="text" name="permissions_string" placeholder="rwxrwxrwx" value={ this.state.permissionString } onChange={ this.handlePermissionStringChange } onKeyPress= { this.handlePermissionStringEntered }/>
+            <div>
+              <input className={`form-control ${this.state.permissionStringClassInput}`} type="text" name="permissions_string" placeholder="rwxrwxrwx" value={ this.state.permissionString } onChange={ this.handlePermissionStringChange } onKeyPress= { this.handlePermissionStringEntered }/>
             </div>
           </div>
         </div>
