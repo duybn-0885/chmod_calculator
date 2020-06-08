@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 
@@ -40,7 +39,7 @@ class CheckBox extends React.Component {
     return (
       <div>
         <label><strong>{ this.props.permissionName }</strong></label>
-        <input type="checkbox" name="permission" value={ this.props.permissionValue } onChange={ this.handleChange } />
+        <input type="checkbox" name="permission" value={ this.props.permissionValue } onChange={ this.handleChange } checked={this.props.permission}/>
       </div>
     )
   }
@@ -51,7 +50,7 @@ class Permission extends React.Component {
     super(props);
     this.state = {
       permissionNumber: 0,
-      permissionGroupName: props.permissionGroupName
+      permissionGroupName: props.permissionGroupName,
     };
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
   }
@@ -71,15 +70,19 @@ class Permission extends React.Component {
   }
 
   render() {
+    let readPermission = this.props.permissionString[0] === 'r' ? true : false;
+    let writePermission = this.props.permissionString[1] === 'w' ? true : false;
+    let executePermission = this.props.permissionString[2] === 'x' ? true : false;
+
     return (
       <div className="col-md-4">
         <h1>{ this.props.permissionGroupName }</h1>
         <br/>
-        <CheckBox permissionName="Read" permissionValue="4" onCheckboxChange={ this.handleCheckboxChange }></CheckBox>
+        <CheckBox permissionName="Read" permissionValue="4" onCheckboxChange={ this.handleCheckboxChange } permission= { readPermission }></CheckBox>
         <br/>
-        <CheckBox permissionName="Write" permissionValue="2" onCheckboxChange={ this.handleCheckboxChange }></CheckBox>
+        <CheckBox permissionName="Write" permissionValue="2" onCheckboxChange={ this.handleCheckboxChange } permission= { writePermission }></CheckBox>
         <br/>
-        <CheckBox permissionName="Execute" permissionValue="1" onCheckboxChange={ this.handleCheckboxChange }></CheckBox>
+        <CheckBox permissionName="Execute" permissionValue="1" onCheckboxChange={ this.handleCheckboxChange } permission= { executePermission }></CheckBox>
       </div>
     )
   }
@@ -91,7 +94,7 @@ class LinuxPermission extends React.Component {
     this.state = {
       ownerPermission: 0,
       groupPermission: 0,
-      publicPermission: 0
+      publicPermission: 0,
     }
     this.handleModChange = this.handleModChange.bind(this);
   }
@@ -115,11 +118,15 @@ class LinuxPermission extends React.Component {
   }
 
   render() {
+    let ownerPermissionString = this.props.permissionString.substring(0, 3);
+    let groupPermissionString = this.props.permissionString.substring(3, 6);
+    let publicPermissionString = this.props.permissionString.substring(6, 9);
+
     return (
       <div className="row">
-        <Permission permissionGroupName="Owner" onModChange={ this.handleModChange }></Permission>
-        <Permission permissionGroupName="Group" onModChange={ this.handleModChange }></Permission>
-        <Permission permissionGroupName="Public" onModChange={ this.handleModChange }></Permission>
+        <Permission permissionGroupName="Owner" onModChange={ this.handleModChange } permissionString={ ownerPermissionString }></Permission>
+        <Permission permissionGroupName="Group" onModChange={ this.handleModChange } permissionString={ groupPermissionString }></Permission>
+        <Permission permissionGroupName="Public" onModChange={ this.handleModChange } permissionString={ publicPermissionString }></Permission>
       </div>
     )
   }
@@ -136,8 +143,8 @@ class ChmodCaculator extends React.Component {
     };
     this.handleUpdatePermissionNumber = this.handleUpdatePermissionNumber.bind(this);
     this.handlePermissionNumberChange = this.handlePermissionNumberChange.bind(this);
-    this.handlePermissionStringChange = this.handlePermissionStringChange.bind(this);
     this.handlePermissionNumberEntered = this.handlePermissionNumberEntered.bind(this);
+    this.handlePermissionStringChange = this.handlePermissionStringChange.bind(this);
     this.handlePermissionStringEntered = this.handlePermissionStringEntered.bind(this);
   }
 
@@ -162,11 +169,17 @@ class ChmodCaculator extends React.Component {
   }
 
   handlePermissionNumberEntered(e) {
-    if(e.key == 'Enter') {
+    if(e.key === 'Enter') {
       if(e.target.value.match(regexPermissionNumber)) {
+        let permissionNumber = e.target.value;
+        let permissionString = '';
+
+        [...permissionNumber].forEach(permissionvVal => permissionString += getKeyByValue(modStrings, parseInt(permissionvVal)));
+
         this.setState({
-          permissionString: e.target.value,
-          permissionStringClassInput: 'has-success'
+          permissionNumber: permissionNumber,
+          permissionString: permissionString,
+          permissionNumberClassInput: 'has-success'
         });
       } else {
         this.setState({ permissionNumberClassInput: 'has-error' });
@@ -175,7 +188,7 @@ class ChmodCaculator extends React.Component {
   }
 
   handlePermissionStringEntered(e) {
-    if(e.key == 'Enter') {
+    if(e.key === 'Enter') {
       if(e.target.value.match(regexPermissionString)) {
         this.setState({
           permissionString: e.target.value,
@@ -190,7 +203,7 @@ class ChmodCaculator extends React.Component {
   render() {
     return(
       <div>
-        <LinuxPermission onUpdatePermissionNumber={ this.handleUpdatePermissionNumber }></LinuxPermission>
+        <LinuxPermission onUpdatePermissionNumber={ this.handleUpdatePermissionNumber } permissionString={ this.state.permissionString }></LinuxPermission>
         <br/>
         <div className="row">
           <h1 className="col-md-4">Linux Permissions</h1>
