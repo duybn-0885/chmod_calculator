@@ -4,7 +4,7 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 
 const regexPermissionNumber = /^[0-7]{3}$/g;
-const regexPermissionString = /^([r-][w-][x-]){3}$g/;
+const regexPermissionString = /^([r-][w-][x-]){3}$/g;
 const modStrings = {
   '---': 0,
   '--x': 1,
@@ -118,9 +118,9 @@ class LinuxPermission extends React.Component {
   }
 
   render() {
-    let ownerPermissionString = this.props.permissionString.substring(0, 3);
-    let groupPermissionString = this.props.permissionString.substring(3, 6);
-    let publicPermissionString = this.props.permissionString.substring(6, 9);
+    let ownerPermissionString = this.props.permissionString.length === 9 ? this.props.permissionString.substring(0, 3) : '';
+    let groupPermissionString = this.props.permissionString.length === 9 ? this.props.permissionString.substring(3, 6) : '';
+    let publicPermissionString = this.props.permissionString.length === 9 ? this.props.permissionString.substring(6, 9) : '';
 
     return (
       <div className="row">
@@ -139,13 +139,16 @@ class ChmodCaculator extends React.Component {
       permissionNumber: '',
       permissionString: '',
       permissionNumberClassInput: '',
-      permissionStringClassInput: ''
+      permissionStringClassInput: '',
+      linuxPermissionString: ''
     };
     this.handleUpdatePermissionNumber = this.handleUpdatePermissionNumber.bind(this);
     this.handlePermissionNumberChange = this.handlePermissionNumberChange.bind(this);
     this.handlePermissionNumberEntered = this.handlePermissionNumberEntered.bind(this);
     this.handlePermissionStringChange = this.handlePermissionStringChange.bind(this);
     this.handlePermissionStringEntered = this.handlePermissionStringEntered.bind(this);
+    this.handleInputStringBlur = this.handleInputStringBlur.bind(this);
+    this.handleInputNumberBlur = this.handleInputNumberBlur.bind(this);
   }
 
   handleUpdatePermissionNumber(mods) {
@@ -172,14 +175,14 @@ class ChmodCaculator extends React.Component {
     if(e.key === 'Enter') {
       if(e.target.value.match(regexPermissionNumber)) {
         let permissionNumber = e.target.value;
-        let permissionString = '';
+        let linuxPermissionString = '';
 
-        [...permissionNumber].forEach(permissionvVal => permissionString += getKeyByValue(modStrings, parseInt(permissionvVal)));
+        [...permissionNumber].forEach(permissionvVal => linuxPermissionString += getKeyByValue(modStrings, parseInt(permissionvVal)));
 
         this.setState({
-          permissionNumber: permissionNumber,
-          permissionString: permissionString,
-          permissionNumberClassInput: 'is-valid'
+          linuxPermissionString: linuxPermissionString,
+          permissionString: '',
+          permissionNumberClassInput: 'is-valid',
         });
       } else {
         this.setState({ permissionNumberClassInput: 'is-invalid' });
@@ -189,10 +192,18 @@ class ChmodCaculator extends React.Component {
 
   handlePermissionStringEntered(e) {
     if(e.key === 'Enter') {
-      if(e.target.value.match(regexPermissionString)) {
+      let permissionString = e.target.value;
+      let permissionNumber = '';
+
+      for(let i=0; i<3; i++) {
+        permissionNumber+= modStrings[permissionString.substring(i*3, (i+1)*3)];
+      }
+
+      if(permissionString.match(regexPermissionString)) {
         this.setState({
-          permissionString: e.target.value,
-          permissionStringClassInput: 'is-valid'
+          permissionNumber: permissionNumber,
+          linuxPermissionString: permissionString,
+          permissionStringClassInput: 'is-valid',
         });
       } else {
         this.setState({ permissionStringClassInput: 'is-invalid' });
@@ -200,21 +211,29 @@ class ChmodCaculator extends React.Component {
     }
   }
 
+  handleInputStringBlur() {
+    this.setState({ permissionStringClassInput: '' });
+  }
+
+  handleInputNumberBlur() {
+    this.setState({ permissionNumberClassInput: '' });
+  }
+
   render() {
     return(
       <div>
-        <LinuxPermission onUpdatePermissionNumber={ this.handleUpdatePermissionNumber } permissionString={ this.state.permissionString }></LinuxPermission>
+        <LinuxPermission onUpdatePermissionNumber={ this.handleUpdatePermissionNumber } permissionString={ this.state.linuxPermissionString }></LinuxPermission>
         <br/>
         <div className="row">
           <h1 className="col-md-4">Linux Permissions</h1>
           <div className="col-md-4">
             <div>
-              <input className={`form-control ${this.state.permissionNumberClassInput}`} type="text" name="permissions_number" placeholder="000" value={ this.state.permissionNumber } onChange={ this.handlePermissionNumberChange } onKeyPress= { this.handlePermissionNumberEntered }/>
+              <input className={`form-control ${this.state.permissionNumberClassInput}`} type="text" name="permissions_number" placeholder="000" value={ this.state.permissionNumber } onChange={ this.handlePermissionNumberChange } onKeyPress={ this.handlePermissionNumberEntered } onBlur={ this.handleInputNumberBlur }/>
             </div>
           </div>
           <div className="col-md-4">
             <div>
-              <input className={`form-control ${this.state.permissionStringClassInput}`} type="text" name="permissions_string" placeholder="rwxrwxrwx" value={ this.state.permissionString } onChange={ this.handlePermissionStringChange } onKeyPress= { this.handlePermissionStringEntered }/>
+              <input className={`form-control ${this.state.permissionStringClassInput}`} type="text" name="permissions_string" placeholder="rwxrwxrwx" value={ this.state.permissionString } onChange={ this.handlePermissionStringChange } onKeyPress={ this.handlePermissionStringEntered }  onBlur={ this.handleInputStringBlur }/>
             </div>
           </div>
         </div>
