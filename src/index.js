@@ -27,6 +27,20 @@ class CheckBox extends React.Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
+  static getDerivedStateFromProps(props, current_state) {
+    // if(props.permission === true && current_state.checked === false) {
+    //   return {
+    //     checked: props.permission
+    //   }
+    // }
+    // return {
+    //   checked: current_state.checked
+    // }
+    return {
+      checked: props.permission
+    }
+  }
+
   handleChange(e) {
     let permissionValue = e.target.value;
 
@@ -39,7 +53,7 @@ class CheckBox extends React.Component {
     return (
       <div>
         <label><strong>{ this.props.permissionName }</strong></label>
-        <input type="checkbox" name="permission" value={ this.props.permissionValue } onChange={ this.handleChange } checked={ this.props.permission || this.state.checked }/>
+        <input type="checkbox" name="permission" value={ this.props.permissionValue } onChange={ this.handleChange } checked={ this.state.checked }/>
       </div>
     )
   }
@@ -53,6 +67,12 @@ class Permission extends React.Component {
       permissionGroupName: props.permissionGroupName,
     };
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+  }
+
+  static getDerivedStateFromProps(props, current_state) {
+    return {
+      permissionNumber: modStrings[props.permissionString] || current_state.permissionNumber
+    }
   }
 
   async handleCheckboxChange(permissionValue, checked) {
@@ -97,6 +117,14 @@ class LinuxPermission extends React.Component {
       publicPermission: 0,
     }
     this.handleModChange = this.handleModChange.bind(this);
+  }
+
+  static getDerivedStateFromProps(props, current_state) {
+    return {
+      ownerPermission: modStrings[props.permissionString.substring(0, 3)] || current_state.ownerPermission,
+      groupPermission: modStrings[props.permissionString.substring(3, 6)] || current_state.groupPermission,
+      publicPermission: modStrings[props.permissionString.substring(6, 9)] || current_state.publicPermission
+    }
   }
 
   async handleModChange(permissionNumber, permissionGroupName) {
