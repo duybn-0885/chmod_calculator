@@ -5,54 +5,56 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 
 const modStrings = {'r': 0, 'w': 1, 'x': 2};
+const regexPermissionNumber = /^[0-7]{3}$/g;
+const regexPermissionString = /^([r-][w-][x-]){3}$g/;
 
-function convertToShortString(permission_number) {
-  if(permission_number >= 4) {
-    return 'r' + convertToShortString(permission_number - 4);
-  } else if (permission_number >= 2) {
-    return 'w' + convertToShortString(permission_number - 2);
-  } else if (permission_number >= 1) {
-    return 'x' + convertToShortString(permission_number - 1);
+function convertToShortString(permissionNumber) {
+  if(permissionNumber >= 4) {
+    return 'r' + convertToShortString(permissionNumber - 4);
+  } else if (permissionNumber >= 2) {
+    return 'w' + convertToShortString(permissionNumber - 2);
+  } else if (permissionNumber >= 1) {
+    return 'x' + convertToShortString(permissionNumber - 1);
   }
 
   return '';
 }
 
-function convertToString(permission_number) {
-  let short_string = convertToShortString(permission_number)
-  let sample_string = '';
+function convertToString(permissionNumber) {
+  let shortString = convertToShortString(permissionNumber)
+  let sampleString = '';
 
   Object.keys(modStrings).forEach((key) => {
-    if(short_string.includes(key)) {
-      sample_string += key;
+    if(shortString.includes(key)) {
+      sampleString += key;
     } else {
-      sample_string += '-';
+      sampleString += '-';
     }
   });
 
-  return sample_string;
+  return sampleString;
 }
 
 class CheckBox extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { checked: false, permission_value: this.props.permission_value };
+    this.state = { checked: false, permissionValue: this.props.permissionValue };
     this.handleChange = this.handleChange.bind(this);
   }
 
   handleChange(e) {
-    let permission_value = e.target.value;
+    let permissionValue = e.target.value;
 
     this.setState({ checked: !this.state.checked },
-      () => { this.props.onCheckboxChange(permission_value, this.state.checked)
+      () => { this.props.onCheckboxChange(permissionValue, this.state.checked)
     });
   }
 
   render() {
     return (
       <div>
-        <label><strong>{ this.props.permission_name }</strong></label>
-        <input type="checkbox" name="permission" value={ this.props.permission_value } onChange={ this.handleChange } />
+        <label><strong>{ this.props.permissionName }</strong></label>
+        <input type="checkbox" name="permission" value={ this.props.permissionValue } onChange={ this.handleChange } />
       </div>
     )
   }
@@ -62,36 +64,36 @@ class Permission extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      permission_number: 0,
-      permission_group_name: props.permission_group_name
+      permissionNumber: 0,
+      permissionGroupName: props.permissionGroupName
     };
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
   }
 
-  async handleCheckboxChange(permission_value, checked) {
-    let permission_number = this.state.permission_number;
-    let permission_val = parseInt(permission_value);
+  async handleCheckboxChange(permissionValue, checked) {
+    let permissionNumber = this.state.permissionNumber;
+    let permissionVal = parseInt(permissionValue);
 
     if(checked) {
-      permission_number += permission_val;
+      permissionNumber += permissionVal;
     } else {
-      permission_number -= permission_val;
+      permissionNumber -= permissionVal;
     }
 
-    await this.setState({ permission_number: permission_number });
-    await this.props.onModChange(this.state.permission_number, this.state.permission_group_name);
+    await this.setState({ permissionNumber: permissionNumber });
+    await this.props.onModChange(this.state.permissionNumber, this.state.permissionGroupName);
   }
 
   render() {
     return (
       <div className="col-md-4">
-        <h1>{ this.props.permission_group_name }</h1>
+        <h1>{ this.props.permissionGroupName }</h1>
         <br/>
-        <CheckBox permission_name="Read" permission_value="4" onCheckboxChange={ this.handleCheckboxChange }></CheckBox>
+        <CheckBox permissionName="Read" permissionValue="4" onCheckboxChange={ this.handleCheckboxChange }></CheckBox>
         <br/>
-        <CheckBox permission_name="Write" permission_value="2" onCheckboxChange={ this.handleCheckboxChange }></CheckBox>
+        <CheckBox permissionName="Write" permissionValue="2" onCheckboxChange={ this.handleCheckboxChange }></CheckBox>
         <br/>
-        <CheckBox permission_name="Execute" permission_value="1" onCheckboxChange={ this.handleCheckboxChange }></CheckBox>
+        <CheckBox permissionName="Execute" permissionValue="1" onCheckboxChange={ this.handleCheckboxChange }></CheckBox>
       </div>
     )
   }
@@ -101,23 +103,23 @@ class LinuxPermission extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      owner_permission: 0,
-      group_permission: 0,
-      public_permission: 0
+      ownerPermission: 0,
+      groupPermission: 0,
+      publicPermission: 0
     }
     this.handleModChange = this.handleModChange.bind(this);
   }
 
-  async handleModChange(permission_number, permission_group_name) {
-    switch(permission_group_name) {
+  async handleModChange(permissionNumber, permissionGroupName) {
+    switch(permissionGroupName) {
       case 'Owner':
-        await this.setState({ owner_permission: permission_number });
+        await this.setState({ ownerPermission: permissionNumber });
         break;
       case 'Group':
-        await this.setState({ group_permission: permission_number });
+        await this.setState({ groupPermission: permissionNumber });
         break;
       case 'Public':
-        await this.setState({ public_permission: permission_number });
+        await this.setState({ publicPermission: permissionNumber });
         break;
       default:
         break;
@@ -129,9 +131,9 @@ class LinuxPermission extends React.Component {
   render() {
     return (
       <div className="row">
-        <Permission permission_group_name="Owner" onModChange={ this.handleModChange }></Permission>
-        <Permission permission_group_name="Group" onModChange={ this.handleModChange }></Permission>
-        <Permission permission_group_name="Public" onModChange={ this.handleModChange }></Permission>
+        <Permission permissionGroupName="Owner" onModChange={ this.handleModChange }></Permission>
+        <Permission permissionGroupName="Group" onModChange={ this.handleModChange }></Permission>
+        <Permission permissionGroupName="Public" onModChange={ this.handleModChange }></Permission>
       </div>
     )
   }
@@ -141,30 +143,62 @@ class ChmodCaculator extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      permission_number: '',
-      permission_string: ''
+      permissionNumber: '',
+      permissionString: '',
+      permissionNumberClassInput: '',
+      permissionStringClassInput: ''
     };
     this.handleUpdatePermissionNumber = this.handleUpdatePermissionNumber.bind(this);
+    this.handlePermissionNumberChange = this.handlePermissionNumberChange.bind(this);
+    this.handlePermissionStringChange = this.handlePermissionStringChange.bind(this);
+    this.handlePermissionNumberEntered = this.handlePermissionNumberEntered.bind(this);
+    this.handlePermissionStringEntered = this.handlePermissionStringEntered.bind(this);
   }
 
   handleUpdatePermissionNumber(mods) {
-    let permission_number = '';
-    let permission_string = '';
+    let permissionNumber = '';
+    let permissionString = '';
 
     Object.keys(mods).forEach((key) => {
-      permission_number += mods[key];
-      permission_string += convertToString(parseInt(mods[key]));
+      permissionNumber += mods[key];
+      permissionString += convertToString(parseInt(mods[key]));
     })
 
-    this.setState({ permission_number: permission_number, permission_string: permission_string });
+    this.setState({ permissionNumber: permissionNumber, permissionString: permissionString });
   }
 
-  handlePermissionNumberChange() {
-
+  handlePermissionNumberChange(e) {
+    this.setState({ permissionNumber: e.target.value });
   }
 
-  handlePermissionStringChange() {
+  handlePermissionStringChange(e) {
+    this.setState({ permissionString: e.target.value });
+  }
 
+  handlePermissionNumberEntered(e) {
+    if(e.key == 'Enter') {
+      if(e.target.value.match(regexPermissionNumber)) {
+        this.setState({
+          permissionString: e.target.value,
+          permissionStringClassInput: 'has-success'
+        });
+      } else {
+        this.setState({ permissionNumberClassInput: 'has-error' });
+      }
+    }
+  }
+
+  handlePermissionStringEntered(e) {
+    if(e.key == 'Enter') {
+      if(e.target.value.match(regexPermissionString)) {
+        this.setState({
+          permissionString: e.target.value,
+          permissionStringClassInput: 'has-success'
+        });
+      } else {
+        this.setState({ permissionStringClassInput: 'has-error' });
+      }
+    }
   }
 
   render() {
@@ -175,10 +209,14 @@ class ChmodCaculator extends React.Component {
         <div className="row">
           <h1 className="col-md-4">Linux Permissions</h1>
           <div className="col-md-4">
-            <input type="text" name="permissions_number" placeholder="000" value={ this.state.permission_number } onChange={ this.handlePermissionNumberChange }/>
+            <div className={`form-group ${this.state.permissionNumberClassInput}`}>
+              <input type="text" name="permissions_number" placeholder="000" value={ this.state.permissionNumber } onChange={ this.handlePermissionNumberChange } onKeyPress= { this.handlePermissionNumberEntered }/>
+            </div>
           </div>
           <div className="col-md-4">
-            <input type="text" name="permissions_string" placeholder="rwxrwxrwx" value={ this.state.permission_string } onChange={ this.handlePermissionStringChange }/>
+            <div className={`form-group ${this.state.permissionStringClassInput}`}>
+              <input type="text" name="permissions_string" placeholder="rwxrwxrwx" value={ this.state.permissionString } onChange={ this.handlePermissionStringChange } onKeyPress= { this.handlePermissionStringEntered }/>
+            </div>
           </div>
         </div>
       </div>
@@ -191,7 +229,4 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
